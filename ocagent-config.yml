@@ -1,0 +1,6 @@
+receivers:
+  opencensus:
+    address: 0.0.0.0:30080
+exporters:
+  prometheus:
+    address: 0.0.0.0:9100

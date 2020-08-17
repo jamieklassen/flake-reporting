@@ -1,0 +1,17 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:30080"
+exporters:
+  opencensus:
+    endpoint: "oc-agent:30080"
+    insecure: true
+#   prometheus:
+#     endpoint: "0.0.0.0:9100"
+service:
+  pipelines:
+    metrics:
+      receivers: [otlp]
+      # exporters: [prometheus]
+      exporters: [opencensus]

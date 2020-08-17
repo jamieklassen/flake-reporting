@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  oc-agent:
+    image: omnition/opencensus-agent:0.1.11
+    ports:
+    - "9100:9100"
+    volumes:
+    - .:/conf
+    command:
+      - --config=/conf/ocagent-config.yml
+  otel-collector:
+    image: otel/opentelemetry-collector:0.8.0
+    ports:
+    - "30080:30080"
+    volumes:
+    - .:/conf
+    command: ["--config=/conf/otel-collector-config.yml"]
+  prometheus:
+    image: prom/prometheus
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        echo "
+        global:
+          scrape_interval: '5s'
+          evaluation_interval: '5s'
+
+        scrape_configs:
+          - job_name: 'ginkgo'
+            static_configs:
+              - targets:
+                - 'oc-agent:9100'
+        " > config.yml
+
+          exec prometheus \
+            --config.file=config.yml \
+            --storage.tsdb.path=/prometheus
+    ports:
+      - '9090:9090'
